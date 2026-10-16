@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Note #{{ note['id'] }} | Smart Notes Summarizer</title>
+    <!-- Font Awesome 6 Professional Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Custom Modern Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>SmartNotes AI</h1>
+                    <span>Intelligent Study Summarizer</span>
+                </div>
+            </a>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Summarizer</span>
+                </a>
+                <a href="/notes" class="nav-link active">
+                    <i class="fa-solid fa-bookmark"></i>
+                    <span>Saved Notes</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container" style="max-width: 900px; margin-top: 30px;">
+
+        <div style="margin-bottom: 20px;">
+            <a href="/notes" class="btn btn-secondary btn-sm" style="display: inline-flex;">
+                <i class="fa-solid fa-arrow-left"></i> Back to Saved Notes
+            </a>
+        </div>
+
+        <section class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-title-icon" style="background: var(--warning-light); color: var(--warning);">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <div>
+                        <h3>Edit Study Material</h3>
+                        <p class="card-subtitle">Editing Note #{{ note['id'] }} &bull; Updating will re-generate the AI summary &amp; revision points</p>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST">
+                <div class="editor-wrapper">
+                    <textarea 
+                        name="study_material" 
+                        class="editor" 
+                        placeholder="Modify study material..."
+                        style="min-height: 280px;"
+                        required>{{ note["study_material"] }}</textarea>
+
+                    <div class="editor-meta">
+                        <div class="stats-group">
+                            <span class="stat-item">
+                                <i class="fa-solid fa-font"></i>
+                                Words: <span class="stat-val" id="val-words">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <i class="fa-solid fa-keyboard"></i>
+                                Chars: <span class="stat-val" id="val-chars">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <i class="fa-solid fa-clock"></i>
+                                Read Time: <span class="stat-val" id="val-time">0 min</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Update &amp; Re-Summarize
+                    </button>
+
+                    <a href="/notes" class="btn btn-secondary">
+                        <i class="fa-solid fa-xmark"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; Smart Notes Summarizer &bull; Built with Flask &amp; Modern AI NLP</p>
+    </footer>
+
+    <!-- Client Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

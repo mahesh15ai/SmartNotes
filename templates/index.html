@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Notes Summarizer | AI Study Assistant</title>
+    <!-- Font Awesome 6 Professional Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Custom Modern Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>SmartNotes AI</h1>
+                    <span>Intelligent Study Summarizer</span>
+                </div>
+            </a>
+            <nav class="nav-links">
+                <a href="/" class="nav-link active">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Summarizer</span>
+                </a>
+                <a href="/notes" class="nav-link">
+                    <i class="fa-solid fa-bookmark"></i>
+                    <span>Saved Notes</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Header -->
+    <section class="hero">
+        <div class="hero-pill">
+            <i class="fa-solid fa-bolt"></i> Powered by Smart NLP & Gemini AI
+        </div>
+        <h2>Transform Long Study Material into <span class="highlight">Key Takeaways</span></h2>
+        <p>Paste notes, textbook paragraphs, or lecture slides to generate concise summaries and exam-ready revision points in seconds.</p>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Notification Message -->
+        {% if message %}
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>{{ message }}</span>
+            </div>
+        {% endif %}
+
+        <!-- Input Card -->
+        <section class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-title-icon">
+                        <i class="fa-solid fa-pen-nib"></i>
+                    </div>
+                    <div>
+                        <h3>Study Material Input</h3>
+                        <p class="card-subtitle">Paste raw text or select a sample topic below</p>
+                    </div>
+                </div>
+
+                <div class="quick-samples">
+                    <span class="quick-label"><i class="fa-solid fa-lightbulb"></i> Try Sample:</span>
+                    <button type="button" class="sample-chip" data-sample="networks">
+                        <i class="fa-solid fa-network-wired"></i> OSI Model
+                    </button>
+                    <button type="button" class="sample-chip" data-sample="os">
+                        <i class="fa-solid fa-microchip"></i> OS Deadlocks
+                    </button>
+                    <button type="button" class="sample-chip" data-sample="ml">
+                        <i class="fa-solid fa-chart-line"></i> ML Overfitting
+                    </button>
+                </div>
+            </div>
+
+            <form method="POST" action="/summarize" id="summarize-form">
+                <div class="editor-wrapper">
+                    <textarea 
+                        name="study_material" 
+                        class="editor" 
+                        placeholder="Paste your study notes, textbook chapter, or lecture content here..."
+                        required>{{ request.form.get('study_material', '') }}</textarea>
+
+                    <div class="editor-meta">
+                        <div class="stats-group">
+                            <span class="stat-item">
+                                <i class="fa-solid fa-font"></i>
+                                Words: <span class="stat-val" id="val-words">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <i class="fa-solid fa-keyboard"></i>
+                                Chars: <span class="stat-val" id="val-chars">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <i class="fa-solid fa-clock"></i>
+                                Read Time: <span class="stat-val" id="val-time">0 min</span>
+                            </span>
+                        </div>
+
+                        <a href="/" class="btn-secondary btn-sm" title="Clear text input" style="text-decoration:none; padding: 4px 10px; border-radius: 6px; font-size: 12px;">
+                            <i class="fa-solid fa-rotate-left"></i> Reset
+                        </a>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button type="submit" class="btn btn-primary" id="summarize-btn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Summarize Notes
+                    </button>
+
+                    <a href="/notes" class="btn btn-secondary">
+                        <i class="fa-solid fa-folder-open"></i> View Saved Notes
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <!-- Summary & Key Points Output -->
+        {% if summary %}
+            <section class="card" style="border-color: rgba(79, 70, 229, 0.4);">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon" style="background: var(--success-light); color: var(--success);">
+                            <i class="fa-solid fa-square-poll-vertical"></i>
+                        </div>
+                        <div>
+                            <h3>Generated Summary & Insights</h3>
+                            <p class="card-subtitle">Concise essence and high-priority revision points</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Section -->
+                <div class="result-box summary-box">
+                    <div class="result-header">
+                        <div class="result-title">
+                            <i class="fa-solid fa-book-open" style="color: var(--primary);"></i>
+                            <span>Core Summary</span>
+                        </div>
+                        <button type="button" class="copy-btn" data-target="summary-content">
+                            <i class="fa-solid fa-copy"></i> Copy Summary
+                        </button>
+                    </div>
+                    <div class="result-content" id="summary-content">
+                        {{ summary }}
+                    </div>
+                </div>
+
+                <!-- Key Points Section -->
+                {% if key_points %}
+                    <div class="result-box points-box">
+                        <div class="result-header">
+                            <div class="result-title">
+                                <i class="fa-solid fa-list-check" style="color: var(--accent);"></i>
+                                <span>Key Revision Points</span>
+                            </div>
+                            <button type="button" class="copy-btn" data-target="points-content">
+                                <i class="fa-solid fa-copy"></i> Copy Points
+                            </button>
+                        </div>
+
+                        <div class="points-list" id="points-content">
+                            {% for point in key_points %}
+                                <div class="point-card">
+                                    <div class="point-badge">{{ loop.index }}</div>
+                                    <div class="point-text">{{ point }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Save Action Form -->
+                <div class="button-row" style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-color);">
+                    <form method="POST" action="/save" style="display: inline-block;">
+                        <input type="hidden" name="study_material" value="{{ request.form.get('study_material', '') }}">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-floppy-disk"></i> Save to Notes Library
+                        </button>
+                    </form>
+
+                    <a href="/notes" class="btn btn-secondary">
+                        <i class="fa-solid fa-book-bookmark"></i> Explore All Saved Notes
+                    </a>
+                </div>
+            </section>
+        {% endif %}
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; Smart Notes Summarizer &bull; Built with Flask &amp; Modern AI NLP</p>
+    </footer>
+
+    <!-- Client Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
